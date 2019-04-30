@@ -24,6 +24,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 
+// author herbert QQ 464884492
 public class WordAnalysis {
 
 	private final String defaultRegex = "\\$\\{[^{}]+\\}";

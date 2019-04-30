@@ -1,5 +1,6 @@
 package com.buildword;
 
+//author herbert QQ 464884492
 public class TagInfo {
 	public String TagText; // ��${}
 	public String TagValue;

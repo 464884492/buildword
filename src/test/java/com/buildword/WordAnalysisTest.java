@@ -10,6 +10,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 
 import junit.framework.TestCase;
 
+//author herbert QQ 464884492
 public class WordAnalysisTest extends TestCase {
 	public void testBuildWord() {
 
