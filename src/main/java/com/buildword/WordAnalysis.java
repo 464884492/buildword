@@ -34,8 +34,8 @@ public class WordAnalysis {
 	@SuppressWarnings("resource")
 	private void CopyFile() throws IOException {
 		File tFile = new File(saveFile);
-		//20190501 退出不删除文件
-		//tFile.deleteOnExit();
+		// 20190501 退出不删除文件
+		// tFile.deleteOnExit();
 		if (!tFile.getParentFile().exists()) {
 			// 目标文件所在目录不存在
 			tFile.getParentFile().mkdirs();
@@ -207,8 +207,7 @@ public class WordAnalysis {
 
 	// 获取文档中所有的表格，不包含嵌套表格
 	// listTable false 返回普通表格, true 返回列表表格
-	public List<XWPFTable> getDocTables(XWPFDocument doc, boolean listTable,
-			String regex) {
+	public List<XWPFTable> getDocTables(XWPFDocument doc, boolean listTable, String regex) {
 		List<XWPFTable> lstTables = new ArrayList<XWPFTable>();
 		for (XWPFTable table : doc.getTables()) {
 			String tbName = getTableListName(table, regex);
@@ -223,8 +222,7 @@ public class WordAnalysis {
 	}
 
 	// 向 taglist中添加新解析的段落信息
-	private void setTagInfoList(List<TagInfo> list, XWPFParagraph p,
-			String regex) {
+	private void setTagInfoList(List<TagInfo> list, XWPFParagraph p, String regex) {
 		if (regex == "")
 			regex = defaultRegex;
 		Pattern pattern = Pattern.compile(regex);
@@ -261,8 +259,7 @@ public class WordAnalysis {
 	}
 
 	// 获取Table列表中的配置信息
-	public Map<String, List<List<TagInfo>>> getTableTag(XWPFDocument doc,
-			String regex) {
+	public Map<String, List<List<TagInfo>>> getTableTag(XWPFDocument doc, String regex) {
 		Map<String, List<List<TagInfo>>> mapList = new HashMap<String, List<List<TagInfo>>>();
 		List<XWPFTable> lstTables = getDocTables(doc, true, regex);
 		for (XWPFTable table : lstTables) {
@@ -289,16 +286,14 @@ public class WordAnalysis {
 
 	// 替换文本 已处理跨行的情况
 	// 注意 文档中 不能出现类似$${\w+}的字符，由于searchText会一个字符一个字符做比价，找到第一个比配的开始计数
-	public void ReplaceInParagraph(List<TagInfo> tagList, XWPFParagraph para,
-			String regex) {
+	public void ReplaceInParagraph(List<TagInfo> tagList, XWPFParagraph para, String regex) {
 		if (regex == "")
 			regex = defaultRegex;
 		List<XWPFRun> runs = para.getRuns();
 		for (TagInfo ti : tagList) {
 			String find = ti.TagText;
 			String replValue = ti.TagValue;
-			TextSegement found = para.searchText(find,
-					new PositionInParagraph());
+			TextSegement found = para.searchText(find, new PositionInParagraph());
 			if (found != null) {
 				// 判断查找内容是否在同一个Run标签中
 				if (found.getBeginRun() == found.getEndRun()) {
@@ -309,8 +304,7 @@ public class WordAnalysis {
 				} else {
 					// 存在多个Run标签
 					StringBuilder sb = new StringBuilder();
-					for (int runPos = found.getBeginRun(); runPos <= found
-							.getEndRun(); runPos++) {
+					for (int runPos = found.getBeginRun(); runPos <= found.getEndRun(); runPos++) {
 						XWPFRun run = runs.get(runPos);
 						sb.append(run.getText((run.getTextPosition())));
 					}
@@ -319,8 +313,7 @@ public class WordAnalysis {
 					XWPFRun firstRun = runs.get(found.getBeginRun());
 					firstRun.setText(replaced, 0);
 					// 删除后边的run标签
-					for (int runPos = found.getBeginRun() + 1; runPos <= found
-							.getEndRun(); runPos++) {
+					for (int runPos = found.getBeginRun() + 1; runPos <= found.getEndRun(); runPos++) {
 						// 清空其他标签内容
 						XWPFRun partNext = runs.get(runPos);
 						partNext.setText("", 0);
@@ -339,8 +332,7 @@ public class WordAnalysis {
 	}
 
 	// 替换列表数据
-	public void ReplaceInTable(List<List<TagInfo>> tagList, XWPFTable table,
-			String regex) {
+	public void ReplaceInTable(List<List<TagInfo>> tagList, XWPFTable table, String regex) {
 		int tempRowIndex = table.getRows().size() - 1;
 		XWPFTableRow tempRow = table.getRow(tempRowIndex);
 		for (List<TagInfo> lst : tagList) {
@@ -359,6 +351,16 @@ public class WordAnalysis {
 		}
 		// 删除模版行
 		table.removeRow(tempRowIndex);
+		// 20190501 替换列表表格标记
+		XWPFTableCell tagTableCell = table.getRow(0).getTableCells().get(0);
+		String tbName = getTableListName(table, regex);
+		List<TagInfo> tableHead = new ArrayList<TagInfo>();
+		tableHead.add(new TagInfo(tbName, ""));
+		for (XWPFParagraph p : tagTableCell.getParagraphs()) {
+			if (p.getText() != null && p.getText().length() > 0) {
+				ReplaceInParagraph(tableHead, p, regex);
+			}
+		}
 	}
 
 	// 替换所有tag
@@ -391,4 +393,3 @@ public class WordAnalysis {
 		}
 	}
 }
-
