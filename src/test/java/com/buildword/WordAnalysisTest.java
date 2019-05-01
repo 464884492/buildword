@@ -1,6 +1,9 @@
 package com.buildword;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +17,13 @@ import junit.framework.TestCase;
 public class WordAnalysisTest extends TestCase {
 	public void testBuildWord() {
 
-		//TODO 修改成具体的word模板路径
-		WordAnalysis wa = new WordAnalysis("D:\\word.docx", "D:\\t.docx");
+		File f = new File("1.txt");
+		System.out.println(f.getAbsolutePath());
+		String tempFile = "src/word.docx";
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmss");
+		String outFile = "src/" + fmt.format(new Date()) + ".docx";
+
+		WordAnalysis wa = new WordAnalysis(tempFile, outFile);
 		try {
 			XWPFDocument d = wa.openDocument();
 			// 获取普通标签
